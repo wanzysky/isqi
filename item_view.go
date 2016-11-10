@@ -1,16 +1,39 @@
 package main
 
-import termbox "github.com/nsf/termbox-go"
+import (
+	"fmt"
+	"strings"
+)
 
-var content_color = termbox.ColorWhite
-var content_bg_color = termbox.ColorBlack
+const formatter = "fg-white,bg-blue"
+
+type HasContent interface {
+	Content(int) string
+	EntryPoint() *Window
+}
 
 type ItemView struct {
-	BaseView
-	content  string
+	object   HasContent
+	width    int
 	selected bool
 }
 
-func (item Item) Draw() {
-	print_content(item.location, content_color, content_bg_color, item.content, item.vertical)
+func (item ItemView) Content() string {
+	str := item.object.Content(item.width)
+	if item.selected {
+		str = fmt.Sprintf("[%s](%s)", str, formatter)
+	}
+	return str
+}
+
+func (item ItemView) Match(destination string) bool {
+	content := item.object.Content(0)
+	return strings.Contains(content, destination)
+}
+
+func (item ItemView) Enter() {
+	window := item.object.EntryPoint()
+	if window != nil {
+		nav.Push(window)
+	}
 }
