@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -86,4 +87,15 @@ func Tables() []*TableModel {
 		tables = append(tables, &table)
 	}
 	return tables
+}
+
+func (adapter Adapter) Select(table_name string, args ...string) string {
+	var fields string
+	if len(args) == 0 {
+		fields = "*"
+	} else {
+		fields = strings.Join(args, ",")
+	}
+
+	return "SELECT " + fields + " FROM " + table_name + " LIMIT 100"
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 
-	ui "github.com/gizak/termui"
+	ui "github.com/wanzysky/termui"
 )
 
 var nav *Navigation
@@ -56,7 +56,4 @@ func main() {
 	nav.Push(window)
 
 	ui.Loop()
-	ui.Handle("/sys/kbd/q", func(ui.Event) {
-		ui.StopLoop()
-	})
 }

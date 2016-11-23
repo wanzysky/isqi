@@ -1,17 +1,22 @@
 package main
 
-import ui "github.com/gizak/termui"
+import (
+	termbox "github.com/nsf/termbox-go"
+	ui "github.com/wanzysky/termui"
+)
 
 type DashboardView struct {
 	BaseView
 	tips     string
 	typing   bool
 	value    string
+	cursor   Point
 	view     *ui.Par
 	delegate Dashable
 }
 
 type Dashable interface {
+	Operations() map[string]string
 	SearchingTip() string
 	Search(string)
 	Choose(int)
@@ -34,9 +39,23 @@ func (dashboard *DashboardView) View() *ui.Par {
 	return dashboard.view
 }
 
+func (dashboard *DashboardView) HelpingText() string {
+	operations := dashboard.delegate.Operations()
+	tips_str := ""
+	for key, op := range operations {
+		tips_str += "[" + key + "] " + "[" + op + "]" + "(fg-white,bg-blue)  "
+	}
+	dashboard.tips = tips_str
+	return dashboard.tips
+}
+
 func (dashboard *DashboardView) Sync() {
 	if dashboard.view == nil {
 		return
+	}
+
+	if dashboard.tips == "" {
+		dashboard.HelpingText()
 	}
 
 	dashboard.view.Width = dashboard.size.width
@@ -44,7 +63,9 @@ func (dashboard *DashboardView) Sync() {
 	dashboard.view.X = dashboard.location.x
 	dashboard.view.Y = dashboard.location.y
 
-	dashboard.view.Text = dashboard.Content()
+	content := dashboard.Content()
+	dashboard.view.Text = content
+	dashboard.cursor = Point{x: dashboard.location.x + len(content) + 1, y: dashboard.location.y + 1}
 }
 
 func (dashboard *DashboardView) Content() string {
@@ -58,6 +79,12 @@ func (dashboard *DashboardView) Content() string {
 }
 
 func (dashboard *DashboardView) Draw() {
+	if dashboard.typing {
+		termbox.SetCursor(dashboard.cursor.x, dashboard.cursor.y)
+	} else {
+		termbox.HideCursor()
+	}
+
 	view := dashboard.View()
 	ui.Render(view)
 }

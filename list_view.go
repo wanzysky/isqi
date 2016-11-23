@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	ui "github.com/gizak/termui"
+	ui "github.com/wanzysky/termui"
 )
 
 const content_color = ui.ColorYellow
@@ -111,6 +111,7 @@ func (list ListView) Listening() {
 	})
 }
 
+// Dashable Interface
 func (list ListView) Search(content string) {
 	var new_items []ItemView
 	for _, data := range list.datasource {
@@ -132,6 +133,17 @@ func (list ListView) Display() {
 func (list ListView) Clear() {
 	ui.DefaultEvtStream.ResetHandlers()
 	ui.Clear()
+}
+
+func (list ListView) Operations() map[string]string {
+	operatios := map[string]string{
+		"s":     "Search",
+		"c":     "Quick Choose",
+		"d":     "Database Detail",
+		"C-c":   "Quit",
+		"Enter": "Use",
+	}
+	return operatios
 }
 
 func (list ListView) Choose(index int) {
