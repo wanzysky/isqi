@@ -1,0 +1,2 @@
+# isqi
+Better database console
