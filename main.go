@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 
-	ui "github.com/wanzysky/termui"
+	ui "github.com/gizak/termui"
 )
 
 var nav *Navigation

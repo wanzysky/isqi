@@ -2,7 +2,7 @@ package main
 
 import (
 	termbox "github.com/nsf/termbox-go"
-	ui "github.com/wanzysky/termui"
+	ui "github.com/gizak/termui"
 )
 
 type DashboardView struct {

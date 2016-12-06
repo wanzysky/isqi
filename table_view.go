@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	ui "github.com/wanzysky/termui"
+	ui "github.com/gizak/termui"
 )
 
 type TableView struct {
@@ -30,7 +30,7 @@ func NewTableView(position Point, size Size, datasource [][]string) *TableView {
 	table_view.view.Y = table_view.location.y
 	table_view.view.FgColor = ui.ColorWhite
 	table_view.view.BgColor = ui.ColorDefault
-	table_view.view.TextAlign = "center"
+	table_view.view.TextAlign = ui.AlignCenter
 	table_view.view.Seperator = false
 	table_view.current = 0
 	table_view.Serialize()

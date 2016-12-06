@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	ui "github.com/wanzysky/termui"
+	ui "github.com/gizak/termui"
 )
 
 const content_color = ui.ColorYellow

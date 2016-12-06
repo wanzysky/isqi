@@ -9,6 +9,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type Processer func([]interface{})
+
 type Adapter struct {
 	username string
 	passwd   string
@@ -98,4 +100,24 @@ func (adapter Adapter) Select(table_name string, args ...string) string {
 	}
 
 	return "SELECT " + fields + " FROM " + table_name + " LIMIT 100"
+}
+
+func (dtapter Adapter) ShowColumns(table_name string, full bool) string {
+	return "SHOW FULL COLUMNS FROM " + table_name
+}
+
+func (adapter Adapter) Query(sql string, accepter []interface{}, callback Processer) error {
+	rows, err := connection.Query(sql)
+	//var result [][]string
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(accepter...)
+		callback(accepter)
+	}
+
+	return nil
 }

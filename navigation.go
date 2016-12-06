@@ -1,6 +1,6 @@
 package main
 
-import ui "github.com/wanzysky/termui"
+import ui "github.com/gizak/termui"
 
 type Pair struct {
 	index int
