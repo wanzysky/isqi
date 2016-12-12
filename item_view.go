@@ -31,7 +31,7 @@ func (item ItemView) Match(destination string) bool {
 	return strings.Contains(content, destination)
 }
 
-func (item ItemView) Enter() {
+func (item *ItemView) Enter() {
 	window := item.object.EntryPoint()
 	if window != nil {
 		nav.Push(window)

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"go-webterm"
 	"os"
 	"strings"
 
@@ -57,10 +58,10 @@ func Databases(connection *sql.DB) []DatabaseModel {
 
 func (adapter Adapter) Use(db DatabaseModel) *sql.DB {
 	dsn_describer := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", adapter.username, adapter.passwd, adapter.host, adapter.port, db.name)
+	debuger.Log(dsn_describer)
 	connection, err := sql.Open("mysql", dsn_describer)
 	if err != nil {
 		fmt.Println("Failed to choose Database")
-		panic(err.Error())
 	}
 	return connection
 }

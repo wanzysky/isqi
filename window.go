@@ -22,6 +22,7 @@ func (window *Window) Clear() {
 	}
 	window.active = false
 }
+
 func (window *Window) Display() {
 	for _, view := range window.views {
 		view.Display()

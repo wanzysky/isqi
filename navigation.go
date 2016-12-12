@@ -17,27 +17,17 @@ func NewNavigatoin(window *Window) *Navigation {
 	nav.windows = make([]*Window, 0)
 	nav.windows = append(nav.windows, window)
 	nav.current = Pair{0, window}
+	window.Display()
 	return &nav
 }
 
 func (nav *Navigation) Push(window *Window) *Navigation {
-	nav.windows = append(nav.windows, window)
-	nav.Forward()
-	return nav
-}
-
-func (nav *Navigation) Forward() *Navigation {
+	current_index := nav.current.index
+	nav.current.value.Clear()
+	nav.windows = append(nav.windows[:current_index+1], window)
 	nav.current.index += 1
-	length := len(nav.windows)
-	if nav.current.index >= length {
-		nav.current.index = length - 1
-	} else {
-		if nav.current.value != nil {
-			nav.current.value.Clear()
-		}
-		nav.current.value = nav.windows[nav.current.index]
-		nav.current.value.Display()
-	}
+	nav.current.value = window
+	nav.current.value.Display()
 	return nav
 }
 
