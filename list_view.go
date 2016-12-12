@@ -93,7 +93,7 @@ func (list ListView) Draw() {
 	ui.Render(view)
 }
 
-func (list ListView) Listening() {
+func (list *ListView) Listening() {
 	ui.Handle("/sys/kbd/<down>", func(ui.Event) {
 		list.Down()
 		list.Sync()
@@ -124,13 +124,13 @@ func (list ListView) Search(content string) {
 	list.Draw()
 }
 
-func (list ListView) Display() {
+func (list *ListView) Display() {
 	list.Sync()
 	list.Draw()
 	list.Listening()
 }
 
-func (list ListView) Clear() {
+func (list *ListView) Clear() {
 	ui.DefaultEvtStream.ResetHandlers()
 	ui.Clear()
 }
