@@ -1,6 +1,6 @@
 package main
 
-const usage = `
+const USAGE = `
 Usage:
 	isqi -d DATABASE
 

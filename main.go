@@ -1,15 +1,11 @@
 package main
 
 import (
-	"database/sql"
-
 	ui "github.com/gizak/termui"
 	"go-webterm"
+	adpt "isqi/adapters"
+	wd "isqi/windows"
 )
-
-var nav *Navigation
-var connection *sql.DB
-var adapter Adapter
 
 func main() {
 	go func() { debuger.ListenAndServe() }()
@@ -22,9 +18,8 @@ func main() {
 
 	config := Config()
 	window := config.Connect()
-	defer connection.Close()
+	defer adpt.Conn.Close()
 
-	nav = NewNavigatoin(window)
-
+	wd.NewNavigatoin(window)
 	ui.Loop()
 }
