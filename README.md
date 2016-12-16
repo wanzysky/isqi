@@ -33,5 +33,7 @@ Operations:
 ```
 
 For more informations please visit https://github.com/wanzysky/isqi
+
 Bug reporting & feature request: https://github.com/wanzysky/isqi/issues
+
 Author connection: i@wanzy.me
