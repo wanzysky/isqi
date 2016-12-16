@@ -40,6 +40,11 @@ func NewStatusBarView(rect image.Rectangle, delegate Statusable) *StatusBarView 
 	return status_bar
 }
 
+func (bar *StatusBarView) Success(message string) {
+	bar.state = succeed
+	bar.label = message
+}
+
 func (bar *StatusBarView) Notice(message string) {
 	bar.label = message
 	bar.Sync()

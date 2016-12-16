@@ -2,7 +2,6 @@ package windows
 
 import (
 	ui "github.com/gizak/termui"
-	"go-webterm"
 	m "isqi/models"
 	v "isqi/views"
 )
@@ -34,8 +33,24 @@ func (window *ListWindow) Listening() {
 		list.Display()
 	})
 
+	ui.Handle("/sys/kbd/C-f", func(ui.Event) {
+		list.PageDown()
+		list.Display()
+	})
+
+	ui.Handle("/sys/kbd/C-b", func(ui.Event) {
+		list.PageUp()
+		list.Display()
+	})
+
 	ui.Handle("/sys/kbd/<enter>", func(ui.Event) {
 		window.Enter(list.Current())
+	})
+
+	ui.Handle("/sys/kbd/d", func(ui.Event) {
+		if !window.dash.Key("d") {
+			window.Detail(list.Current())
+		}
 	})
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
@@ -43,16 +58,22 @@ func (window *ListWindow) Listening() {
 	})
 
 	ui.Handle("/sys/kbd/<escape>", func(ui.Event) {
-		dashboard.Escape()
+		if !dashboard.Escape() {
+			Nav.Back()
+		}
 	})
 
 	ui.Handle("/sys/kbd/", func(e ui.Event) {
 		dashboard.Key(e.Data.(ui.EvtKbd).KeyStr)
 	})
 }
+func (window *ListWindow) Detail(item *v.ItemView) {
+	if table, ok := item.Object.(*m.TableModel); ok {
+		Nav.Push(NewTableStuctureWindow(table))
+	}
+}
 
 func (window *ListWindow) Enter(item *v.ItemView) {
-	debuger.Logf("%v", item.Object)
 	if db, ok := item.Object.(m.DatabaseModel); ok {
 		Nav.Push(NewTableIndexWindow(&db))
 	}

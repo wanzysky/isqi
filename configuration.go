@@ -139,22 +139,9 @@ func (conf *Configuration) Connect() wd.Naviable {
 			database_view_list = append(database_view_list, v.ItemView{Object: db})
 		}
 
-		main_view = v.NewListView(image.Rect(0, 3, width, height-3), "Select DataBase", database_view_list)
+		main_view = v.NewListView(image.Rect(0, 3, width, height), "Select DataBase", database_view_list)
 		dash = v.NewDashboardView(image.Rect(0, 0, width, 3))
 		dash.Delegate = main_view
-		operatios := map[string]string{
-			"s":     "Search",
-			"c":     "Quick Choose",
-			"d":     "Database Detail",
-			"C-c":   "Quit",
-			"Enter": "Use",
-		}
-
-		tips_str := ""
-		for key, op := range operatios {
-			tips_str += "[" + key + "] " + "[" + op + "]" + "(fg-white,bg-blue)  "
-		}
-		dash.Tips = tips_str
 		return wd.NewListWindow(main_view, dash)
 	} else {
 		db := m.DatabaseModel{}

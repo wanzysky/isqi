@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-
 	ui "github.com/gizak/termui"
 	"image"
 )
@@ -15,6 +14,8 @@ type TableView struct {
 	topleft         image.Point
 	current         int
 	offset          int
+	page            int
+	per_page        int
 	view            *ui.Table
 	status_delegate *StatusBarView
 }
@@ -37,6 +38,7 @@ func NewTableView(rect image.Rectangle, datasource [][]string) *TableView {
 	table_view.view.Seperator = false
 	table_view.current = 0
 	table_view.offset = 0
+	table_view.per_page = rect.Dy() - 2
 	table_view.Serialize()
 
 	return &table_view
@@ -47,14 +49,15 @@ func (tableview *TableView) Serialize() {
 		tableview.rows = [][]string{}
 		return
 	}
-	tableview.max_lengh = make([]int, len(tableview.datasource[0]))
-	tableview.rows = make([][]string, len(tableview.datasource))
+	datasource := tableview.CurrentPage()
+	tableview.max_lengh = make([]int, len(datasource[0]))
+	tableview.rows = make([][]string, len(datasource))
 
-	if len(tableview.datasource) <= 0 {
+	if len(datasource) <= 0 {
 		return
 	}
 
-	for j, row := range tableview.datasource {
+	for j, row := range tableview.CurrentPage() {
 		tableview.rows[j] = make([]string, len(row))
 		for i, cell := range row {
 			length := len(cell)
@@ -90,6 +93,10 @@ func (tableview *TableView) Sync() {
 	tableview.view.BgColors[tableview.current] = ACTIVE_BG_COLOR
 }
 
+func (tableview *TableView) ReDraw() {
+	ui.ClearArea(tableview.rect, DEFAULT_BG_COLOR)
+	ui.Render(tableview.view)
+}
 func (tableview *TableView) Draw() {
 	ui.Render(tableview.view)
 }
@@ -117,14 +124,48 @@ func (tableview *TableView) Select(new_current int) {
 	tableview.current = new_current
 }
 
+func (tableview *TableView) CurrentPage() [][]string {
+	start := tableview.per_page * tableview.page
+	ending := start + tableview.per_page
+	length := len(tableview.datasource)
+	if ending > length {
+		ending = length
+	}
+	return tableview.datasource[start:ending]
+}
+
+func (tableview *TableView) PageTo(page int) {
+	if page < 0 {
+		return
+	}
+	length := len(tableview.datasource)
+	if page*tableview.per_page > length {
+		return
+	}
+
+	tableview.page = page
+	tableview.rows = tableview.CurrentPage()
+}
+
+func (tableview *TableView) PageUp() {
+	tableview.PageTo(tableview.page - 1)
+	tableview.Sync()
+	tableview.ReDraw()
+}
+
+func (tableview *TableView) PageDown() {
+	tableview.PageTo(tableview.page + 1)
+	tableview.Sync()
+	tableview.ReDraw()
+}
+
 func (tableview *TableView) Left() {
 	if tableview.offset == 0 {
 		return
 	}
 	tableview.offset -= 1
-	ui.ClearArea(image.Rect(tableview.view.X, tableview.view.Y, tableview.view.X+tableview.view.Width, tableview.view.Y+tableview.view.Height), DEFAULT_BG_COLOR)
 	tableview.Sync()
-	tableview.Draw()
+	tableview.ReDraw()
 }
 
 func (tableview *TableView) Right() {
@@ -132,12 +173,9 @@ func (tableview *TableView) Right() {
 		return
 	}
 	tableview.offset += 1
-	ui.ClearArea(image.Rect(tableview.view.X, tableview.view.Y, tableview.view.X+tableview.view.Width, tableview.view.Y+tableview.view.Height), DEFAULT_BG_COLOR)
 	tableview.Sync()
-	tableview.Draw()
+	tableview.ReDraw()
 }
-
-func (tableview *TableView) Enter() {}
 
 // Statusable Interface
 func (tableview TableView) Loading(percent int) string {
@@ -155,9 +193,9 @@ func (tableview TableView) Failed() string {
 // Dashable Interface
 func (tableview TableView) Operations() map[string]string {
 	operatios := map[string]string{
-		"s":     "Search",
-		"c":     "Quick Choose",
-		"d":     "Database Detail",
+		"c":     "Console",
+		"d":     "Column Detail",
+		"C-f/b": "Page up/down",
 		"C-c":   "Quit",
 		"Enter": "Edit",
 	}

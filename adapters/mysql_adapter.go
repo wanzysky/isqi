@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type Processer func([]interface{})
+type Processer func()
 
 type Adapter struct {
 	Username string
@@ -100,11 +100,15 @@ func (adapter Adapter) Select(table_name string, args ...string) string {
 	return "SELECT " + fields + " FROM " + table_name + " LIMIT 100"
 }
 
+func (adapter Adapter) Count(table_name string) string {
+	return "SELECT COUNT(1) FROM " + table_name
+}
+
 func (dtapter Adapter) ShowColumns(table_name string, full bool) string {
 	return "SHOW FULL COLUMNS FROM " + table_name
 }
 
-func (adapter Adapter) Query(sql string, accepter []interface{}, callback Processer) error {
+func (adapter Adapter) Query(sql string, callback Processer, accepter ...interface{}) error {
 	rows, err := Conn.Query(sql)
 	//var result [][]string
 	if err != nil {
@@ -114,7 +118,7 @@ func (adapter Adapter) Query(sql string, accepter []interface{}, callback Proces
 
 	for rows.Next() {
 		err = rows.Scan(accepter...)
-		callback(accepter)
+		callback()
 	}
 
 	return nil

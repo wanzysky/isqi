@@ -16,6 +16,8 @@ type ListView struct {
 	datasource    []ItemView
 	items         []ItemView
 	title         string
+	per_page      int
+	page          int
 	current_index int
 	current       *ItemView
 	view          *ui.List
@@ -24,13 +26,18 @@ type ListView struct {
 func NewListView(rect image.Rectangle, title string, subs []ItemView) *ListView {
 	list := ListView{title: title, datasource: subs}
 	list.rect = rect
+	list.per_page = rect.Dy() - 2
+	list.page = 0
 	list.title = title
 	list.view = list.View()
-	for _, item := range subs {
+	for _, item := range list.datasource {
 		item.width = rect.Dx() - 2
 	}
-
-	list.items = subs
+	limit := len(list.datasource)
+	if list.per_page < limit {
+		limit = list.per_page
+	}
+	list.items = list.datasource[:limit]
 	if len(subs) > 0 {
 		list.current_index = 0
 		list.current = &list.items[0]
@@ -63,6 +70,33 @@ func (list *ListView) Up() {
 
 func (list *ListView) Down() {
 	list.Select(list.current_index + 1)
+}
+
+func (list *ListView) PageTo(page int) {
+	if page < 0 {
+		return
+	}
+	length := len(list.datasource)
+	if page*list.per_page > length {
+		return
+	}
+
+	list.page = page
+	start := list.per_page * list.page
+	ending := start + list.per_page
+	if ending > length {
+		ending = length
+	}
+
+	list.items = list.datasource[start:ending]
+}
+
+func (list *ListView) PageUp() {
+	list.PageTo(list.page - 1)
+}
+
+func (list *ListView) PageDown() {
+	list.PageTo(list.page + 1)
 }
 
 func (list ListView) View() *ui.List {
@@ -117,14 +151,16 @@ func (list *ListView) Display() {
 }
 
 func (list *ListView) Clear() {
+	ui.ClearArea(list.rect, content_bg_color)
 }
 
 func (list ListView) Operations() map[string]string {
 	operatios := map[string]string{
 		"s":     "Search",
 		"c":     "Quick Choose",
-		"d":     "Database Detail",
+		"d":     "Show Structure",
 		"C-c":   "Quit",
+		"C-f/b": "Page up/down",
 		"Enter": "Use",
 	}
 	return operatios

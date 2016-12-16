@@ -16,12 +16,20 @@ Options:
 	-a Adapter of database
 	--rails Get configurations from rails app database configuration file
 
-Global Rutime Events:
-	[S] Search in list
-	[C] Choose by line number from list or table
+Operations:
+  <Up>    Highlighted line up
+  <Down>  Highlighted line down
+  <Left>  Window left
+  <Right> Window right
+
+	[s]     Search in list
+	[c]     Choose by line number from list or table
+  [d]     Show detail of current line
+  [C-f]   Page down
+  [C-b]   Page up
 	[Enter] Choose currently hilighted line or row
-	[Esc] Back to previous window
-	[C-c] Exit
+	[Esc]   Back
+	[C-c]   Exit
 ```
 
 For more informations please visit https://github.com/wanzysky/isqi

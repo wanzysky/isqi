@@ -112,7 +112,7 @@ func (dashboard *DashboardView) Clear() {
 	ui.Clear()
 }
 
-func (dashboard *DashboardView) Key(key string) {
+func (dashboard *DashboardView) Key(key string) bool {
 	switch key {
 	case "s":
 		if dashboard.typing {
@@ -120,21 +120,26 @@ func (dashboard *DashboardView) Key(key string) {
 		} else {
 			dashboard.Searching()
 		}
+		return true
 	case "c":
 		if dashboard.typing {
 			dashboard.Type("c")
 		} else {
 			dashboard.Choosing()
 		}
+		return true
 	case "C-8":
 		if dashboard.typing {
 			dashboard.Delete()
 		}
+		return true
 	default:
 		if dashboard.typing {
 			dashboard.Type(key)
+			return true
 		}
 	}
+	return false
 }
 
 func (dashboard *DashboardView) Searching() {
@@ -193,12 +198,13 @@ func (dashboard *DashboardView) Delete() {
 	}
 }
 
-func (dashboard *DashboardView) Escape() {
+func (dashboard *DashboardView) Escape() bool {
 	if dashboard.typing {
 		dashboard.Normal()
 		dashboard.Delegate.Normal()
+		return true
 	} else {
-		//nav.Back()
+		return false
 	}
 }
 

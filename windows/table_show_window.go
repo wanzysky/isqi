@@ -1,6 +1,7 @@
 package windows
 
 import (
+	"fmt"
 	ui "github.com/gizak/termui"
 	"image"
 	m "isqi/models"
@@ -17,12 +18,17 @@ type TableShowWindow struct {
 
 func NewTableShowWindow(table *m.TableModel) *TableShowWindow {
 	rect := Size()
-
 	view := TableShowWindow{table: table}
 	dashboard := v.NewDashboardView(image.Rect(rect.Min.X, rect.Min.Y, rect.Max.X, 3))
 	content := v.NewTableView(image.Rect(rect.Min.X, rect.Min.Y+3, rect.Max.X, rect.Max.Y-3), table.Glimpse())
 	dashboard.Delegate = content
 	status := v.NewStatusBarView(image.Rect(rect.Min.X, rect.Max.Y-3, rect.Max.X, rect.Max.Y), content)
+	count := table.Statistic()
+	shown := 100
+	if count < shown {
+		shown = count
+	}
+	status.Success(fmt.Sprintf("Rows 1 - %d of %d from table", shown, count))
 	window := NewWindow(dashboard, content, status)
 	view.table_view = content
 	view.dash = dashboard
@@ -50,11 +56,14 @@ func (window *TableShowWindow) Listening() {
 	})
 
 	ui.Handle("/sys/kbd/<enter>", func(ui.Event) {
-		tableview.Enter()
+		window.Enter()
+	})
+	ui.Handle("/sys/kbd/C-f", func(ui.Event) {
+		tableview.PageDown()
 	})
 
-	ui.Handle("/sys/kdb/", func(e ui.Event) {
-		window.dash.Key(e.Data.(ui.EvtKbd).KeyStr)
+	ui.Handle("/sys/kbd/C-b", func(ui.Event) {
+		tableview.PageUp()
 	})
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
@@ -62,8 +71,15 @@ func (window *TableShowWindow) Listening() {
 	})
 
 	ui.Handle("/sys/kbd/<escape>", func(ui.Event) {
-		window.dash.Escape()
+		if !window.dash.Escape() {
+			Nav.Back()
+		}
 	})
+
+	ui.Handle("/sys/kbd/", func(e ui.Event) {
+		window.dash.Key(e.Data.(ui.EvtKbd).KeyStr)
+	})
+
 }
 
 func (window *TableShowWindow) Display() {
@@ -74,4 +90,8 @@ func (window *TableShowWindow) Display() {
 	}
 	window.active = true
 	window.Listening()
+}
+
+func (window *TableShowWindow) Enter() {
+	Nav.Push(NewTableStuctureWindow(window.table))
 }
