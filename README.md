@@ -3,12 +3,17 @@ Better database console
 
 # QuickStart
 
+### Linux
+  `\curl -sSL http://dwz.cn/4SF8G9 | bash -s stable`
+
+### MacOS
+  `\curl -sSL http://dwz.cn/4SFjJP | bash -s stable`
 
 # description
 
 ```
 Usage:
-	isqi -d DATABASE
+	isqi -p <PASSWD>
 
 Options:
 	-h Database host address, default 'localhost'
@@ -23,14 +28,22 @@ Options:
 Global Rutime Events:
 	[S] Search in list
 	[C] Choose by line number from list or table
+  [D] Current Line Detail
 	[Enter] Choose currently hilighted line or row
 	[Esc] Back to previous window
 	[C-c] Exit
 
 ```
 
+# TODO
+  - Multiple Adapters Support
+
+  - SQL Autocomplement
+
+# More
 For more informations please visit https://github.com/wanzysky/isqi
 
 Bug reporting & feature request: https://github.com/wanzysky/isqi/issues
 
 Author connection: i@wanzy.me
+
