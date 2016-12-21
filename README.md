@@ -1,5 +1,6 @@
 # isqi
-Better database console
+Better database console [![Build Status](https://travis-ci.org/wanzysky/isqi.svg?branch=master)](https://travis-ci.org/wanzysky/isqi)
+
 
 # QuickStart
 

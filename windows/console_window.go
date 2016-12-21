@@ -3,9 +3,9 @@ package windows
 import (
 	"fmt"
 	ui "github.com/gizak/termui"
-	"image"
 	a "github.com/wanzysky/isqi/adapters"
 	v "github.com/wanzysky/isqi/views"
+	"image"
 )
 
 type ConsoleWindow struct {
@@ -109,6 +109,12 @@ func (window *ConsoleWindow) Listening() {
 		}
 	})
 
+	ui.Handle("/sys/kbd/d", func(ui.Event) {
+		if !window.typing {
+			window.Detail(tableview.Current())
+		}
+	})
+
 }
 
 func (window *ConsoleWindow) Exec(query string) {
@@ -121,4 +127,8 @@ func (window *ConsoleWindow) Exec(query string) {
 	} else {
 		window.status_bar.Notice(err.Error())
 	}
+
+}
+func (window *ConsoleWindow) Detail(headers []string, contents []string) {
+	Nav.Push(NewColumnDetailWindow(headers, contents))
 }
