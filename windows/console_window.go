@@ -112,6 +112,8 @@ func (window *ConsoleWindow) Listening() {
 	ui.Handle("/sys/kbd/d", func(ui.Event) {
 		if !window.typing {
 			window.Detail(tableview.Current())
+		} else {
+			window.console_view.Key("d")
 		}
 	})
 

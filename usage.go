@@ -15,11 +15,15 @@ Options:
 	--help Show usages
 
 Global Rutime Events:
-	[S] Search in list
-	[C] Choose by line number from list or table
-	[Enter] Choose currently hilighted line or row
-	[Esc] Back to previous window
-	[C-c] Exit
+	[S]             Search in list
+	[C]             Choose by line number from list or table
+	[DirectionKeys] Move cursor
+	[C-f]           Page down
+	[C-b]           Page up
+	[D]             Current Line Detail
+	[Enter]         Choose currently hilighted line or row
+	[Esc]           Back to previous window
+	[C-c]           Exit
 
 For more informations please visit https://github.com/wanzysky/isqi
 Bug reporting & feature request: https://github.com/wanzysky/isqi/issues

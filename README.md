@@ -1,6 +1,7 @@
-# isqi
-Better database console [![Build Status](https://travis-ci.org/wanzysky/isqi.svg?branch=master)](https://travis-ci.org/wanzysky/isqi)
+# isqi [![Build Status](https://travis-ci.org/wanzysky/isqi.svg?branch=master)](https://travis-ci.org/wanzysky/isqi)
+Better database console
 
+![Screenshot](https://github.com/wanzysky/isqi/blob/master/_screenshots/1.gif)
 
 # QuickStart
 
@@ -26,13 +27,16 @@ Options:
 	--rails Get configurations from rails app database configuration file
 	--help Show usages
 
-Global Rutime Events:
-	[S] Search in list
-	[C] Choose by line number from list or table
-  [D] Current Line Detail
-	[Enter] Choose currently hilighted line or row
-	[Esc] Back to previous window
-	[C-c] Exit
+Rutime Operations:
+	[S]             Search in list
+	[C]             Choose by line number from list or table
+  [DirectionKeys] Move cursor
+  [C-f]           Page down
+  [C-b]           Page up
+  [D]             Current Line Detail
+	[Enter]         Choose currently hilighted line or row
+	[Esc]           Back to previous window
+	[C-c]           Exit
 
 ```
 
