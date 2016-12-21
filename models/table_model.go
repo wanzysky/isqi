@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	adpt "isqi/adapters"
+	adpt "github.com/wanzysky/isqi/adapters"
 	"strconv"
 )
 

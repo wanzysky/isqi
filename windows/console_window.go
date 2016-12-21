@@ -4,8 +4,8 @@ import (
 	"fmt"
 	ui "github.com/gizak/termui"
 	"image"
-	a "isqi/adapters"
-	v "isqi/views"
+	a "github.com/wanzysky/isqi/adapters"
+	v "github.com/wanzysky/isqi/views"
 )
 
 type ConsoleWindow struct {

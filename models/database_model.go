@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	adpt "isqi/adapters"
+	adpt "github.com/wanzysky/isqi/adapters"
 )
 
 type DatabaseModel struct {

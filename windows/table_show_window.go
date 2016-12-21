@@ -4,8 +4,8 @@ import (
 	"fmt"
 	ui "github.com/gizak/termui"
 	"image"
-	m "isqi/models"
-	v "isqi/views"
+	m "github.com/wanzysky/isqi/models"
+	v "github.com/wanzysky/isqi/views"
 )
 
 type TableShowWindow struct {

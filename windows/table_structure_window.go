@@ -2,8 +2,8 @@ package windows
 
 import (
 	"image"
-	m "isqi/models"
-	v "isqi/views"
+	m "github.com/wanzysky/isqi/models"
+	v "github.com/wanzysky/isqi/views"
 )
 
 type TableStructureWindow struct {

@@ -2,7 +2,7 @@ package windows
 
 import (
 	ui "github.com/gizak/termui"
-	v "isqi/views"
+	v "github.com/wanzysky/isqi/views"
 )
 
 type ColumnDetailWindow struct {

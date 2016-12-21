@@ -2,8 +2,8 @@ package main
 
 import (
 	ui "github.com/gizak/termui"
-	adpt "isqi/adapters"
-	wd "isqi/windows"
+	adpt "github.com/wanzysky/isqi/adapters"
+	wd "github.com/wanzysky/isqi/windows"
 )
 
 func main() {

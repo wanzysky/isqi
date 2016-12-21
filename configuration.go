@@ -6,10 +6,10 @@ import (
 	ui "github.com/gizak/termui"
 	"gopkg.in/yaml.v2"
 	"image"
-	adpt "isqi/adapters"
-	m "isqi/models"
-	v "isqi/views"
-	wd "isqi/windows"
+	adpt "github.com/wanzysky/isqi/adapters"
+	m "github.com/wanzysky/isqi/models"
+	v "github.com/wanzysky/isqi/views"
+	wd "github.com/wanzysky/isqi/windows"
 	"os"
 )
 

@@ -2,8 +2,8 @@ package windows
 
 import (
 	"image"
-	model "isqi/models"
-	view "isqi/views"
+	model "github.com/wanzysky/isqi/models"
+	view "github.com/wanzysky/isqi/views"
 )
 
 type TableListWindow struct {
