@@ -58,6 +58,11 @@ func (window *TableShowWindow) Listening() {
 	ui.Handle("/sys/kbd/<enter>", func(ui.Event) {
 		window.Enter()
 	})
+
+	ui.Handle("/sys/kbd/d", func(ui.Event) {
+		window.Detail(tableview.Current())
+	})
+
 	ui.Handle("/sys/kbd/C-f", func(ui.Event) {
 		tableview.PageDown()
 	})
@@ -93,5 +98,9 @@ func (window *TableShowWindow) Display() {
 }
 
 func (window *TableShowWindow) Enter() {
-	Nav.Push(NewTableStuctureWindow(window.table))
+	Nav.Push(NewConsoleWindow())
+}
+
+func (window *TableShowWindow) Detail(headers []string, contents []string) {
+	Nav.Push(NewColumnDetailWindow(headers, contents))
 }

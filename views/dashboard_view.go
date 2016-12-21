@@ -17,11 +17,9 @@ const (
 
 type DashboardView struct {
 	BaseView
+	TypingView
 	Tips     string
-	typing   bool
 	state    DashState
-	value    string
-	cursor   image.Point
 	view     *ui.Par
 	Delegate Dashable
 }
@@ -35,7 +33,8 @@ type Dashable interface {
 }
 
 func NewDashboardView(rect image.Rectangle) *DashboardView {
-	dash := DashboardView{typing: false}
+	dash := DashboardView{}
+	dash.typing = false
 	dash.rect = rect
 	dash.state = DashNormal
 	return &dash

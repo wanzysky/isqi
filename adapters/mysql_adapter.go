@@ -123,3 +123,39 @@ func (adapter Adapter) Query(sql string, callback Processer, accepter ...interfa
 
 	return nil
 }
+
+func (adapter *Adapter) Execute(query string) ([][]string, error) {
+	rows, err := Conn.Query(query)
+	if err != nil {
+		return [][]string{}, err
+	}
+	columns, e := rows.Columns()
+	if e != nil {
+		return [][]string{}, err
+	}
+	width := len(columns)
+	var results [][]string
+	results = append(results, columns)
+	container := make([]sql.RawBytes, width)
+	accepter := make([]interface{}, width)
+	for i, _ := range container {
+		accepter[i] = &(container[i])
+	}
+	count := 0
+	for rows.Next() {
+		if count > 1000 {
+			break
+		}
+		err = rows.Scan(accepter...)
+		if err != nil {
+			return results, err
+		}
+		result := make([]string, width)
+		for index, cell := range container {
+			result[index] = string(cell)
+		}
+		count += 1
+		results = append(results, result)
+	}
+	return results, nil
+}

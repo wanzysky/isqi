@@ -3,6 +3,7 @@ package views
 import (
 	"fmt"
 	ui "github.com/gizak/termui"
+	"go-webterm"
 	"image"
 )
 
@@ -88,15 +89,35 @@ func (tableview *TableView) OffsetRows() (rows [][]string) {
 
 func (tableview *TableView) Sync() {
 	tableview.view.Rows = tableview.OffsetRows()
+	debuger.Logf("%v\n", tableview.view.Rows)
 	tableview.view.Analysis()
 	tableview.view.SetSize()
 	tableview.view.BgColors[tableview.current] = ACTIVE_BG_COLOR
+}
+
+func (tableview *TableView) Update(source [][]string) {
+	tableview.datasource = source
+	tableview.view = &ui.Table{}
+	tableview.view.Width = tableview.rect.Dx()
+	tableview.view.Height = tableview.rect.Dy()
+	tableview.view.X = tableview.rect.Min.X
+	tableview.view.Y = tableview.rect.Min.Y
+	tableview.view.FgColor = ui.ColorWhite
+	tableview.view.BgColor = ui.ColorDefault
+	tableview.view.TextAlign = ui.AlignCenter
+	tableview.view.Seperator = false
+	tableview.current = 0
+	tableview.offset = 0
+	tableview.per_page = tableview.rect.Dy() - 2
+	tableview.Serialize()
+	tableview.Display()
 }
 
 func (tableview *TableView) ReDraw() {
 	ui.ClearArea(tableview.rect, DEFAULT_BG_COLOR)
 	ui.Render(tableview.view)
 }
+
 func (tableview *TableView) Draw() {
 	ui.Render(tableview.view)
 }
@@ -177,6 +198,14 @@ func (tableview *TableView) Right() {
 	tableview.ReDraw()
 }
 
+func (tableview *TableView) Current() ([]string, []string) {
+	if len(tableview.datasource) == 0 {
+		return []string{}, []string{}
+	}
+
+	return tableview.datasource[0], tableview.rows[tableview.current]
+}
+
 // Statusable Interface
 func (tableview TableView) Loading(percent int) string {
 	return fmt.Sprintf("Executing:%d%%", percent)
@@ -193,11 +222,10 @@ func (tableview TableView) Failed() string {
 // Dashable Interface
 func (tableview TableView) Operations() map[string]string {
 	operatios := map[string]string{
-		"c":     "Console",
-		"d":     "Column Detail",
 		"C-f/b": "Page up/down",
 		"C-c":   "Quit",
-		"Enter": "Edit",
+		"Enter": "Console",
+		"d":     "Detail",
 	}
 	return operatios
 }
