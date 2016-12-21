@@ -4,7 +4,7 @@ import (
 	ui "github.com/gizak/termui"
 	"github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
-	"go-webterm"
+
 	"image"
 	"sync"
 	"unicode/utf8"
@@ -98,7 +98,6 @@ func (con *ConsoleView) Key(key_str string) {
 	case "C-8":
 		con.Delete()
 	default:
-		debuger.Logf("str got : %s", key_str)
 		char, _ := utf8.DecodeRuneInString(key_str)
 		con.Type(char)
 	}
@@ -123,7 +122,6 @@ func (con *ConsoleView) Left() {
 		return
 	}
 	word, virtual_width := con.RuneBeforeCursor()
-	debuger.Logf("%c\n", word)
 	con.CursorRight(-runewidth.RuneWidth(word))
 	con.VirtualCursorRight(-virtual_width)
 	con.Sync()
@@ -136,7 +134,6 @@ func (con *ConsoleView) Right() {
 	}
 
 	word, virtual_width := con.RuneOnCursor()
-	debuger.Logf("%c\n", word)
 	con.CursorRight(runewidth.RuneWidth(word))
 	con.VirtualCursorRight(virtual_width)
 	con.Sync()

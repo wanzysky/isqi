@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	ui "github.com/gizak/termui"
 	"gopkg.in/yaml.v2"
@@ -77,12 +78,11 @@ func (machine *ParseMachine) Exec(arg string, conf *Configuration) error {
 		case "-h", "-u", "-d", "-p", "-c", "-P":
 			machine.heading = arg
 			machine.state = MachineStateHeading
-		// case "-P":
-		// 	conf.mode = ConfModeEnterPassword
 		case "--help", "help":
 			conf.mode = ConfModeUsage
 		case "--rails":
 			conf.mode = ConfModeRails
+		case "--pswd":
 		default:
 			conf.mode = ConfModeInvalid
 		}
@@ -116,8 +116,15 @@ func (conf *Configuration) Connect() wd.Naviable {
 	case ConfModeRails:
 		conf.Rails()
 	case ConfModeConfigFile:
-		conf.ConfigFile(conf.sourceFilePath, "json")
+		conf.ConfigFile(conf.sourceFilePath, "yaml")
 	case ConfModeEnterPassword:
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter you password:")
+		text, err := reader.ReadString('\n')
+		if err != nil {
+			panic(err.Error())
+		}
+		conf.passwd = text
 	case ConfModeInvalid:
 	}
 
@@ -166,7 +173,7 @@ func (conf *Configuration) Rails() {
 func (conf *Configuration) ConfigFile(path string, extname string) {
 	file, err := os.Open(path)
 	if err != nil {
-		panic(err.Error)
+		panic("Failed to open file at " + path)
 	}
 
 	data := make([]byte, 1024)

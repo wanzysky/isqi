@@ -12,6 +12,7 @@ Options:
 	-c Path to your YAML configuration file, this will overwrite command line options
 	-a Adapter of database
 	--rails Get configurations from rails app database configuration file
+	--help Show usages
 
 Global Rutime Events:
 	[S] Search in list

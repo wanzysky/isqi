@@ -3,7 +3,6 @@ package views
 import (
 	"fmt"
 	ui "github.com/gizak/termui"
-	"go-webterm"
 	"image"
 )
 
@@ -89,7 +88,6 @@ func (tableview *TableView) OffsetRows() (rows [][]string) {
 
 func (tableview *TableView) Sync() {
 	tableview.view.Rows = tableview.OffsetRows()
-	debuger.Logf("%v\n", tableview.view.Rows)
 	tableview.view.Analysis()
 	tableview.view.SetSize()
 	tableview.view.BgColors[tableview.current] = ACTIVE_BG_COLOR

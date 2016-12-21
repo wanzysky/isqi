@@ -1,6 +1,9 @@
 # isqi
 Better database console
 
+# QuickStart
+
+
 # description
 
 ```
@@ -15,21 +18,15 @@ Options:
 	-c Path to your YAML configuration file, this will overwrite command line options
 	-a Adapter of database
 	--rails Get configurations from rails app database configuration file
+	--help Show usages
 
-Operations:
-  <Up>    Highlighted line up
-  <Down>  Highlighted line down
-  <Left>  Window left
-  <Right> Window right
-
-	[s]     Search in list
-	[c]     Choose by line number from list or table
-  [d]     Show detail of current line
-  [C-f]   Page down
-  [C-b]   Page up
+Global Rutime Events:
+	[S] Search in list
+	[C] Choose by line number from list or table
 	[Enter] Choose currently hilighted line or row
-	[Esc]   Back
-	[C-c]   Exit
+	[Esc] Back to previous window
+	[C-c] Exit
+
 ```
 
 For more informations please visit https://github.com/wanzysky/isqi
