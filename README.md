@@ -28,15 +28,15 @@ Options:
 	--help Show usages
 
 Rutime Operations:
-	[S]             Search in list
-	[C]             Choose by line number from list or table
+  [S]             Search in list
+  [C]             Choose by line number from list or table
   [DirectionKeys] Move cursor
   [C-f]           Page down
   [C-b]           Page up
   [D]             Current Line Detail
-	[Enter]         Choose currently hilighted line or row
-	[Esc]           Back to previous window
-	[C-c]           Exit
+  [Enter]         Choose currently hilighted line or row
+  [Esc]           Back to previous window
+  [C-c]           Exit
 
 ```
 
