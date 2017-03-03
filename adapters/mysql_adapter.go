@@ -3,41 +3,39 @@ package adapters
 import (
 	"database/sql"
 	"fmt"
-	"os"
-	"strings"
+	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type Processer func()
-
-type Adapter struct {
+type MysqlAdapter struct {
 	Username string
 	Passwd   string
 	Host     string
 	Port     string
+	Conn     *sql.DB
 }
 
-var Conn *sql.DB
-var Adpt Adapter
-
-func Connection() *sql.DB {
-	dsn_describer := fmt.Sprintf("%s:%s@tcp(%s:%s)/", Adpt.Username, Adpt.Passwd, Adpt.Host, Adpt.Port)
-	connection, err := sql.Open("mysql", dsn_describer)
-	if err != nil {
-		fmt.Println("Failed to connect Database")
-		panic(err.Error())
-	}
-	Conn = connection
-	return Conn
+func (adapter *MysqlAdapter) Initialize(params map[string]string) {
+	adapter.Username = params["username"]
+	adapter.Passwd = params["passwd"]
+	adapter.Port = params["port"]
+	adapter.Host = params["host"]
 }
 
-func Databases() []string {
-	rows, err := Conn.Query("SHOW DATABASES")
+func (adapter *MysqlAdapter) Connect() {
+	adapter.Use("")
+}
+
+func (adapter *MysqlAdapter) Close() {
+	adapter.Conn.Close()
+}
+
+func (adapter *MysqlAdapter) Databases() []string {
+	rows, err := adapter.Conn.Query("SHOW DATABASES")
 	if err != nil {
-		fmt.Println("Can't connect to host")
-		fmt.Println(err.Error())
-		os.Exit(1)
+		log.Fatal(err)
+		panic("Can't connect to host")
 	}
 
 	values := make([]sql.RawBytes, 1)
@@ -56,22 +54,22 @@ func Databases() []string {
 	return databases
 }
 
-func Use(name string) *sql.DB {
-	dsn_describer := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", Adpt.Username, Adpt.Passwd, Adpt.Host, Adpt.Port, name)
+func (adapter *MysqlAdapter) Use(name string) {
+	dsn_describer := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", adapter.Username, adapter.Passwd, adapter.Host, adapter.Port, name)
 	connection, err := sql.Open("mysql", dsn_describer)
-	Conn = connection
+	adapter.Conn = connection
 	if err != nil {
+		log.Fatal(err)
 		panic(err.Error())
 	}
-	return connection
 }
 
-func Tables() []string {
-	rows, err := Conn.Query("SHOW TABLES")
+func (adapter *MysqlAdapter) Tables() []string {
+	rows, err := adapter.Conn.Query("SHOW TABLES")
 	var tables []string
 	if err != nil {
-		fmt.Println("Can't show tables")
-		panic(err.Error())
+		log.Fatal(err.Error())
+		panic("Can't show tables")
 	}
 
 	values := make([]sql.RawBytes, 1)
@@ -89,43 +87,14 @@ func Tables() []string {
 	return tables
 }
 
-func (adapter Adapter) Select(table_name string, args ...string) string {
-	var fields string
-	if len(args) == 0 {
-		fields = "*"
-	} else {
-		fields = strings.Join(args, ",")
-	}
-
-	return "SELECT " + fields + " FROM " + table_name + " LIMIT 100"
-}
-
-func (adapter Adapter) Count(table_name string) string {
-	return "SELECT COUNT(1) FROM " + table_name
-}
-
-func (dtapter Adapter) ShowColumns(table_name string, full bool) string {
-	return "SHOW FULL COLUMNS FROM " + table_name
-}
-
-func (adapter Adapter) Query(sql string, callback Processer, accepter ...interface{}) error {
-	rows, err := Conn.Query(sql)
+func (adapter *MysqlAdapter) Execute(sql string, accepter ...interface{}) error {
+	_, err := adapter.Conn.Query(sql)
 	//var result [][]string
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(accepter...)
-		callback()
-	}
-
-	return nil
+	return err
 }
 
-func (adapter *Adapter) Execute(query string) ([][]string, error) {
-	rows, err := Conn.Query(query)
+func (adapter *MysqlAdapter) Select(query string) ([][]string, error) {
+	rows, err := adapter.Conn.Query(query)
 	if err != nil {
 		return [][]string{}, err
 	}

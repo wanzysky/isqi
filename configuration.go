@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	ui "github.com/gizak/termui"
-	"gopkg.in/yaml.v2"
-	"image"
 	adpt "github.com/wanzysky/isqi/adapters"
 	m "github.com/wanzysky/isqi/models"
 	v "github.com/wanzysky/isqi/views"
 	wd "github.com/wanzysky/isqi/windows"
+	"gopkg.in/yaml.v2"
+	"image"
 	"os"
 )
 
@@ -127,11 +127,13 @@ func (conf *Configuration) Connect() wd.Naviable {
 		conf.passwd = text
 	case ConfModeInvalid:
 	}
+	params := make(map[string]string)
+	params["username"] = conf.username
+	params["passwd"] = conf.passwd
+	params["host"] = conf.host
+	params["port"] = conf.port
 
-	adpt.Adpt.Username = conf.username
-	adpt.Adpt.Passwd = conf.passwd
-	adpt.Adpt.Host = conf.host
-	adpt.Adpt.Port = conf.port
+	adpt.Adpt.Initialize(params)
 
 	var dash *v.DashboardView
 	var main_view *v.ListView
@@ -139,7 +141,7 @@ func (conf *Configuration) Connect() wd.Naviable {
 	height := ui.TermHeight()
 
 	if conf.database == "" {
-		adpt.Connection()
+		adpt.Adpt.Connect()
 		databases := m.Databases()
 		database_view_list := []v.ItemView{}
 		for _, db := range databases {

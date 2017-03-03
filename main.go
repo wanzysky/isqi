@@ -15,7 +15,7 @@ func main() {
 	defer ui.Close()
 
 	window := config.Connect()
-	defer adpt.Conn.Close()
+	defer adpt.Adpt.Close()
 
 	wd.NewNavigatoin(window)
 	ui.Loop()

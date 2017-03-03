@@ -120,7 +120,7 @@ func (window *ConsoleWindow) Listening() {
 }
 
 func (window *ConsoleWindow) Exec(query string) {
-	table, err := a.Adpt.Execute(query)
+	table, err := a.Adpt.Select(query)
 	if err == nil {
 		window.console_view.Stop()
 		window.typing = false

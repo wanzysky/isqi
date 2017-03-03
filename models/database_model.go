@@ -12,7 +12,7 @@ type DatabaseModel struct {
 }
 
 func Databases() (databases []DatabaseModel) {
-	names := adpt.Databases()
+	names := adpt.Adpt.Databases()
 	for _, name := range names {
 		db := DatabaseModel{}
 		db.Name = name
@@ -32,11 +32,11 @@ func (db DatabaseModel) Content(length int) string {
 }
 
 func (db *DatabaseModel) Use() {
-	adpt.Use(db.Name)
+	adpt.Adpt.Use(db.Name)
 }
 
 func (db *DatabaseModel) FetchTables() []*TableModel {
-	for _, table_name := range adpt.Tables() {
+	for _, table_name := range adpt.Adpt.Tables() {
 		var table_model TableModel
 		table_model.Name = table_name
 		db.Tables = append(db.Tables, &table_model)
