@@ -35,7 +35,7 @@ func NewTableView(rect image.Rectangle, datasource [][]string) *TableView {
 	table_view.view.FgColor = ui.ColorWhite
 	table_view.view.BgColor = ui.ColorDefault
 	table_view.view.TextAlign = ui.AlignCenter
-	table_view.view.Seperator = false
+	table_view.view.Separator = false
 	table_view.current = 0
 	table_view.offset = 0
 	table_view.per_page = rect.Dy() - 2
@@ -103,7 +103,7 @@ func (tableview *TableView) Update(source [][]string) {
 	tableview.view.FgColor = ui.ColorWhite
 	tableview.view.BgColor = ui.ColorDefault
 	tableview.view.TextAlign = ui.AlignCenter
-	tableview.view.Seperator = false
+	tableview.view.Separator = false
 	tableview.current = 0
 	tableview.offset = 0
 	tableview.per_page = tableview.rect.Dy() - 2
