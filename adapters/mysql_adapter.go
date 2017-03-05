@@ -3,9 +3,9 @@ package adapters
 import (
 	"database/sql"
 	"fmt"
-	"log"
-
+	ui "github.com/gizak/termui"
 	_ "github.com/go-sql-driver/mysql"
+	"log"
 )
 
 type MysqlAdapter struct {
@@ -60,8 +60,9 @@ func (adapter *MysqlAdapter) Use(name string) {
 	adapter.Conn = connection
 	if err != nil {
 		log.Fatal(err)
-		panic(err.Error())
+		panic(err)
 	}
+	defer ui.Close()
 }
 
 func (adapter *MysqlAdapter) Tables() []string {
@@ -87,7 +88,7 @@ func (adapter *MysqlAdapter) Tables() []string {
 	return tables
 }
 
-func (adapter *MysqlAdapter) Execute(sql string, accepter ...interface{}) error {
+func (adapter *MysqlAdapter) Execute(sql string) error {
 	_, err := adapter.Conn.Query(sql)
 	//var result [][]string
 	return err

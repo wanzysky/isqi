@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"image"
 	"os"
+	"strings"
 )
 
 type DbConf struct {
@@ -19,6 +20,7 @@ type DbConf struct {
 	passwd   string
 	database string
 	port     string
+	adapter  string
 }
 
 type ConfMode int
@@ -55,10 +57,24 @@ var SupportedAdapter map[string]bool = map[string]bool{
 	"mysql":  true,
 }
 
-func (machine *ParseMachine) Exec(arg string, conf *Configuration) error {
+func Config() *Configuration {
+	conf := Configuration{}
+	conf.adapter = "mysql"
+	conf.host = "localhost"
+	conf.port = "3306"
+	conf.username = "root"
+	conf.passwd = ""
+	conf.mode = ConfModeEnterPassword
+	conf.ParseArgs()
+	return &conf
+}
+
+func (machine *ParseMachine) Exec(arg string, conf *Configuration) bool {
 	switch machine.state {
 	case MachineStateHeading:
 		switch machine.heading {
+		case "-a":
+			conf.adapter = arg
 		case "-h":
 			conf.host = arg
 		case "-u":
@@ -70,62 +86,57 @@ func (machine *ParseMachine) Exec(arg string, conf *Configuration) error {
 		case "-P":
 			conf.port = arg
 		default:
-			panic(fmt.Sprintf("Invalid option %s", machine.heading))
+			conf.Usage()
+			panic(fmt.Sprintf("Invalid options %s", machine.heading))
 		}
 		machine.state = MachineStateContent
-	case MachineStateContent:
+	default:
 		switch arg {
-		case "-h", "-u", "-d", "-p", "-c", "-P":
+		case "-h", "-u", "-d", "-p", "-c", "-P", "-a":
 			machine.heading = arg
 			machine.state = MachineStateHeading
 		case "--help", "help":
 			conf.mode = ConfModeUsage
+			return false
 		case "--rails":
 			conf.mode = ConfModeRails
-		case "--pswd":
+			return false
 		default:
 			conf.mode = ConfModeInvalid
 		}
 	}
-	return nil
-}
-
-func Config() *Configuration {
-	conf := Configuration{}
-	conf.host = "localhost"
-	conf.port = "3306"
-	conf.username = "root"
-	conf.passwd = ""
-	conf.ParseArgs()
-	return &conf
+	return true
 }
 
 func (conf *Configuration) ParseArgs() {
 	args := os.Args[1:]
 	parseMachine := ParseMachine{}
 	for _, arg := range args {
-		parseMachine.Exec(arg, conf)
+		ok := parseMachine.Exec(arg, conf)
+		if !ok {
+			break
+		}
 	}
-}
 
-func (conf *Configuration) Connect() wd.Naviable {
-	switch conf.mode {
-	case ConfModeNormal:
-	case ConfModeUsage:
-		conf.Usage()
-	case ConfModeRails:
-		conf.Rails()
-	case ConfModeConfigFile:
-		conf.ConfigFile(conf.sourceFilePath, "yaml")
-	case ConfModeEnterPassword:
+	if conf.passwd == "" {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter you password:")
 		text, err := reader.ReadString('\n')
 		if err != nil {
 			panic(err.Error())
 		}
-		conf.passwd = text
-	case ConfModeInvalid:
+		conf.passwd = strings.Replace(text, "\n", "", -1)
+	}
+}
+
+func (conf *Configuration) Connect() wd.Naviable {
+	switch conf.mode {
+	case ConfModeUsage:
+		conf.Usage()
+	case ConfModeRails:
+		conf.Rails()
+	case ConfModeConfigFile:
+		conf.ConfigFile(conf.sourceFilePath, "yaml")
 	}
 	params := make(map[string]string)
 	params["username"] = conf.username
@@ -133,6 +144,7 @@ func (conf *Configuration) Connect() wd.Naviable {
 	params["host"] = conf.host
 	params["port"] = conf.port
 
+	adpt.Initialize(conf.adapter)
 	adpt.Adpt.Initialize(params)
 
 	var dash *v.DashboardView

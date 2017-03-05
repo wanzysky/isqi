@@ -11,7 +11,7 @@ type Adapter interface {
 	Use(string)
 	Tables() []string
 	Select(string) ([][]string, error)
-	Execute(string) (string, error)
+	Execute(string) error
 	Close()
 }
 
@@ -34,4 +34,14 @@ func ShowColumns(table_name string, full bool) string {
 
 func Count(table_name string) string {
 	return "SELECT COUNT(1) FROM " + table_name
+}
+
+func Initialize(adapter_name string) {
+	switch adapter_name {
+	case "mysql", "mysql2":
+		Adpt = &(MysqlAdapter{})
+	case "sqlite":
+	default:
+		panic("Unkown adapter" + adapter_name)
+	}
 }
