@@ -6,10 +6,10 @@ Better database console
 # QuickStart
 
 ### Linux
-  `\curl -sSL http://dwz.cn/4SF8G9 | bash -s stable`
+  `\curl -sSL http://dwz.cn/isqi_linux | bash -s stable`
 
 ### MacOS
-  `\curl -sSL http://dwz.cn/4SFjJP | bash -s stable`
+  `\curl -sSL http://dwz.cn/isqi_mac | bash -s stable`
 
 # description
 
