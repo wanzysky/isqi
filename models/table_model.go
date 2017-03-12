@@ -2,6 +2,7 @@ package models
 
 import (
 	adpt "github.com/wanzysky/isqi/adapters"
+	"log"
 	"strconv"
 )
 
@@ -14,46 +15,24 @@ func (table TableModel) Content(int) string {
 	return table.Name
 }
 
-func (table *TableModel) SyncColumns() error {
+func (table *TableModel) SyncColumns() {
 	if len(table.fields) > 0 {
-		return nil
+		return
 	}
 
-	query_sql := adpt.ShowColumns(table.Name, true)
-
-	rows, err := adpt.Adpt.Select(query_sql)
-	containers := rows[0]
-	field := FieldModel{}
-	field.field = string(containers[0])
-	field.types = string(containers[1])
-	field.collation = string(containers[2])
-	field.null = string(containers[3])
-	field.key = string(containers[4])
-	field.defaults = string(containers[5])
-	field.extra = string(containers[6])
-	field.privileges = string(containers[7])
-	field.comment = string(containers[8])
-	table.fields = append(table.fields, field)
-	return err
+	names, attrs := adpt.Adpt.FullColumns(table.Name)
+	var fields []FieldModel
+	for i, name := range names {
+		fields = append(fields, FieldModel{name: name, attributes: attrs[i]})
+	}
+	table.fields = fields
 }
 
 func (table *TableModel) Structure() [][]string {
 	table.SyncColumns()
 	results := make([][]string, 0)
-	header := []string{"field", "type", "collation", "null", "key", "defaults", "extra", "privileges", "comment"}
-	results = append(results, header)
-	for _, field := range table.fields {
-		result := make([]string, 0)
-		result = append(result, field.field)
-		result = append(result, field.types)
-		result = append(result, field.collation)
-		result = append(result, field.null)
-		result = append(result, field.key)
-		result = append(result, field.defaults)
-		result = append(result, field.extra)
-		result = append(result, field.privileges)
-		result = append(result, field.comment)
-		results = append(results, result)
+	if len(table.fields) <= 0 {
+		return results
 	}
 	return results
 }
@@ -64,7 +43,7 @@ func (table *TableModel) Glimpse() [][]string {
 
 	result, err := adpt.Adpt.Select(query)
 	if err != nil {
-		panic("Failed to show table")
+		log.Panic("Failed to show table")
 	}
 	return result
 }

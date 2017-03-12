@@ -7,9 +7,10 @@ import (
 type Adapter interface {
 	Initialize(map[string]string)
 	Connect()
-	Databases() []string
 	Use(string)
+	Databases() []string
 	Tables() []string
+	FullColumns(string) ([]string, []map[string]string)
 	Select(string) ([][]string, error)
 	Execute(string) error
 	Close()
@@ -40,8 +41,13 @@ func Initialize(adapter_name string) {
 	switch adapter_name {
 	case "mysql", "mysql2":
 		Adpt = &(MysqlAdapter{})
-	case "sqlite":
+	case "sqlite", "sqlite3":
+		Adpt = &(SqliteAdapter{})
 	default:
 		panic("Unkown adapter" + adapter_name)
 	}
+}
+
+func IsSqlite(adapter_name string) bool {
+	return adapter_name == "sqlite" || adapter_name == "sqlite3"
 }

@@ -6,6 +6,7 @@ import (
 	ui "github.com/gizak/termui"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"os"
 )
 
 type MysqlAdapter struct {
@@ -32,10 +33,17 @@ func (adapter *MysqlAdapter) Close() {
 }
 
 func (adapter *MysqlAdapter) Databases() []string {
+	defer func() {
+		if r := recover(); r != nil {
+			ui.Close()
+			fmt.Println(r)
+			os.Exit(0)
+		}
+	}()
+
 	rows, err := adapter.Conn.Query("SHOW DATABASES")
 	if err != nil {
-		log.Fatal(err)
-		panic("Can't connect to host")
+		log.Panic(err.Error())
 	}
 
 	values := make([]sql.RawBytes, 1)
@@ -55,14 +63,19 @@ func (adapter *MysqlAdapter) Databases() []string {
 }
 
 func (adapter *MysqlAdapter) Use(name string) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("!")
+			ui.Close()
+		}
+	}()
+
 	dsn_describer := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", adapter.Username, adapter.Passwd, adapter.Host, adapter.Port, name)
 	connection, err := sql.Open("mysql", dsn_describer)
-	adapter.Conn = connection
 	if err != nil {
-		log.Fatal(err)
-		panic(err)
+		panic(err.Error())
 	}
-	defer ui.Close()
+	adapter.Conn = connection
 }
 
 func (adapter *MysqlAdapter) Tables() []string {
@@ -88,6 +101,40 @@ func (adapter *MysqlAdapter) Tables() []string {
 	return tables
 }
 
+func (adapter *MysqlAdapter) FullColumns(table string) ([]string, []map[string]string) {
+	rows, err := adapter.Conn.Query(ShowColumns(table, true))
+	if err != nil {
+		log.Panic(err.Error())
+	}
+	defer rows.Close()
+	container := make([]sql.RawBytes, 9)
+	accepter := make([]interface{}, 9)
+	for i, _ := range container {
+		accepter[i] = &(container[i])
+	}
+	var names []string
+	var attrs []map[string]string
+	for rows.Next() {
+		err = rows.Scan(accepter...)
+		if err != nil {
+			log.Panic(err.Error())
+		}
+		name := string(container[0])
+		attr := make(map[string]string)
+		attr["data type"] = string(container[1])
+		attr["collection"] = string(container[2])
+		attr["null"] = string(container[3])
+		attr["key"] = string(container[4])
+		attr["default"] = string(container[5])
+		attr["extra"] = string(container[6])
+		attr["privileges"] = string(container[7])
+		attr["comment"] = string(container[8])
+		names = append(names, name)
+		attrs = append(attrs, attr)
+	}
+	return names, attrs
+}
+
 func (adapter *MysqlAdapter) Execute(sql string) error {
 	_, err := adapter.Conn.Query(sql)
 	//var result [][]string
@@ -99,6 +146,7 @@ func (adapter *MysqlAdapter) Select(query string) ([][]string, error) {
 	if err != nil {
 		return [][]string{}, err
 	}
+	defer rows.Close()
 	columns, e := rows.Columns()
 	if e != nil {
 		return [][]string{}, err

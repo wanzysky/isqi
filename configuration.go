@@ -21,12 +21,14 @@ type DbConf struct {
 	database string
 	port     string
 	adapter  string
+	file     string
 }
 
 type ConfMode int
 
 const (
-	ConfModeNormal = iota
+	_              = iota
+	ConfModeNormal = 1 << iota
 	ConfModeUsage
 	ConfModeRails
 	ConfModeConfigFile
@@ -64,7 +66,8 @@ func Config() *Configuration {
 	conf.port = "3306"
 	conf.username = "root"
 	conf.passwd = ""
-	conf.mode = ConfModeEnterPassword
+	conf.mode = 0
+	conf.mode |= ConfModeEnterPassword
 	conf.ParseArgs()
 	return &conf
 }
@@ -75,6 +78,9 @@ func (machine *ParseMachine) Exec(arg string, conf *Configuration) bool {
 		switch machine.heading {
 		case "-a":
 			conf.adapter = arg
+			if conf.adapter == "sqlite3" || conf.adapter == "sqlite" {
+				conf.mode &= ^ConfModeEnterPassword
+			}
 		case "-h":
 			conf.host = arg
 		case "-u":
@@ -83,8 +89,13 @@ func (machine *ParseMachine) Exec(arg string, conf *Configuration) bool {
 			conf.database = arg
 		case "-p":
 			conf.passwd = arg
+			conf.mode &= ^ConfModeEnterPassword
 		case "-P":
 			conf.port = arg
+		case "-f":
+			conf.file = arg
+			conf.adapter = "sqlite3"
+			conf.database = arg
 		default:
 			conf.Usage()
 			panic(fmt.Sprintf("Invalid options %s", machine.heading))
@@ -92,17 +103,19 @@ func (machine *ParseMachine) Exec(arg string, conf *Configuration) bool {
 		machine.state = MachineStateContent
 	default:
 		switch arg {
-		case "-h", "-u", "-d", "-p", "-c", "-P", "-a":
+		case "-h", "-u", "-d", "-p", "-c", "-P", "-a", "-f":
 			machine.heading = arg
 			machine.state = MachineStateHeading
 		case "--help", "help":
-			conf.mode = ConfModeUsage
+			conf.mode |= ConfModeUsage
 			return false
 		case "--rails":
 			conf.mode = ConfModeRails
 			return false
 		default:
 			conf.mode = ConfModeInvalid
+			conf.Invalid(arg)
+			return false
 		}
 	}
 	return true
@@ -118,42 +131,34 @@ func (conf *Configuration) ParseArgs() {
 		}
 	}
 
-	if conf.passwd == "" {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Enter you password:")
-		text, err := reader.ReadString('\n')
-		if err != nil {
-			panic(err.Error())
-		}
-		conf.passwd = strings.Replace(text, "\n", "", -1)
-	}
-}
-
-func (conf *Configuration) Connect() wd.Naviable {
-	switch conf.mode {
-	case ConfModeUsage:
+	switch {
+	case conf.mode&ConfModeUsage != 0:
 		conf.Usage()
-	case ConfModeRails:
+	case conf.mode&ConfModeRails != 0:
 		conf.Rails()
-	case ConfModeConfigFile:
+	case conf.mode&ConfModeConfigFile != 0:
 		conf.ConfigFile(conf.sourceFilePath, "yaml")
+	case conf.mode&ConfModeEnterPassword != 0:
+		conf.EnterPasswd()
 	}
+
 	params := make(map[string]string)
 	params["username"] = conf.username
 	params["passwd"] = conf.passwd
 	params["host"] = conf.host
 	params["port"] = conf.port
-
+	params["file"] = conf.file
 	adpt.Initialize(conf.adapter)
 	adpt.Adpt.Initialize(params)
+	adpt.Adpt.Connect()
+}
 
+func (conf *Configuration) Connect() wd.Naviable {
 	var dash *v.DashboardView
 	var main_view *v.ListView
 	width := ui.TermWidth()
 	height := ui.TermHeight()
-
 	if conf.database == "" {
-		adpt.Adpt.Connect()
 		databases := m.Databases()
 		database_view_list := []v.ItemView{}
 		for _, db := range databases {
@@ -174,6 +179,11 @@ func (conf *Configuration) Connect() wd.Naviable {
 func (conf *Configuration) Usage() {
 	fmt.Print(USAGE)
 	os.Exit(0)
+}
+
+func (conf *Configuration) Invalid(option string) {
+	fmt.Printf("Invalid option %s\n", option)
+	conf.Usage()
 }
 
 func (conf *Configuration) Rails() {
@@ -221,6 +231,16 @@ func (conf *Configuration) ConfigFile(path string, extname string) {
 		}
 	case "json":
 	}
+}
+
+func (conf *Configuration) EnterPasswd() {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter you password:")
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		panic(err.Error())
+	}
+	conf.passwd = strings.Replace(text, "\n", "", -1)
 }
 
 func (conf *Configuration) InitFromMap(config_map map[interface{}]interface{}) {

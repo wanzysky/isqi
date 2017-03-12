@@ -11,6 +11,7 @@ Options:
 	-d Database name of your choice, databases will be listed by default
 	-c Path to your YAML configuration file, this will overwrite command line options
 	-a Adapter of database
+	-f Sqlite database file path, only works for adapter sqlite or sqlite3
 	--rails Get configurations from rails app database configuration file
 	--help Show usages
 
@@ -26,6 +27,5 @@ Global Rutime Events:
 	[C-c]           Exit
 
 For more informations please visit https://github.com/wanzysky/isqi
-Bug reporting & feature request: https://github.com/wanzysky/isqi/issues
-Author connection: i@wanzy.me
+Bug reporting or feature request: https://github.com/wanzysky/isqi/issues
 `
